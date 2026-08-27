@@ -1,16 +1,5 @@
-# React + Vite
+//Estudiante: Mario Roberto Rompich Yoc 9490-17-17052
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+//Descripcion: El objetivo de esta tarea es mejorar la estructura base de la Tienda en Línea desarrollada en la Tarea 1, transformándola en una aplicación web interactiva y moderna utilizando React y Bootstrap / React-Bootstrap. El propósito es aplicar componentización, modularidad del código y diseño web responsivo sin perder la arquitectura de información definida previamente.
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+//Enlace de sitio web publicado: https://tiendaenlineareactv1.netlify.app/
