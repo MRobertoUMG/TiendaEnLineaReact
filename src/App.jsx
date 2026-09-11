@@ -1,7 +1,4 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
 import './App.css'
 import Welcome from './Components/Welcome.jsx'
 import  Navbar  from './Components/Navbar.jsx'
@@ -12,6 +9,7 @@ import ProductDetail from './Components/ProductDetail.jsx'
 import SignUp from './Components/SignUp.jsx'
 import Contact from './Components/Contact.jsx'
 import Cart from './Components/Cart.jsx'
+import Login from './Components/Login.jsx'
 
 function App() {
   const [selectedProductId, setSelectedProductId] = useState(null);
@@ -52,9 +50,12 @@ function App() {
         )}
         {currentPage === 'signup' && (
           <div>
-            <SignUp/>
+            <SignUp onNavigate={handleNavigate}/>
           </div>
         ) }
+        {currentPage === 'login' && (
+          <Login onNavigate={handleNavigate} />
+        )}
         {currentPage === 'contact' && (
           <div>
             <Contact/>
