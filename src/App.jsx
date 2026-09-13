@@ -10,6 +10,7 @@ import SignUp from './Components/SignUp.jsx'
 import Contact from './Components/Contact.jsx'
 import Cart from './Components/Cart.jsx'
 import Login from './Components/Login.jsx'
+import Profile from './Components/Profile.jsx'
 
 function App() {
   const [selectedProductId, setSelectedProductId] = useState(null);
@@ -55,6 +56,9 @@ function App() {
         ) }
         {currentPage === 'login' && (
           <Login onNavigate={handleNavigate} />
+        )}
+        {currentPage === 'profile' && (
+          <Profile onNavigate={handleNavigate} />
         )}
         {currentPage === 'contact' && (
           <div>

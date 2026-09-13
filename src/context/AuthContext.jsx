@@ -1,5 +1,5 @@
 import { useEffect, useReducer } from 'react'
-import { AuthContext } from './AuthContextBase.js'
+import { AuthDispatchContext, AuthStateContext } from './AuthContextBase.js'
 
 const SESSION_KEY = 'tienda-session'
 const ACCOUNT_KEY = 'tienda-account'
@@ -53,6 +53,7 @@ export function AuthProvider({ children }) {
       id: crypto.randomUUID(),
       name: userData.name,
       email: userData.email,
+      role: userData.role || 'cliente',
     }
     localStorage.setItem(ACCOUNT_KEY, JSON.stringify({ ...user, password: userData.password }))
     dispatch({ type: 'REGISTER', payload: user })
@@ -64,7 +65,13 @@ export function AuthProvider({ children }) {
       return false
     }
 
-    const user = { id: account.id, name: account.name, email: account.email }
+    const user = {
+      id: account.id,
+      name: account.name,
+      email: account.email,
+      role: account.role || 'cliente',
+      accessDate: new Date().toISOString(),
+    }
     dispatch({ type: 'LOGIN', payload: user })
     return true
   }
@@ -72,8 +79,10 @@ export function AuthProvider({ children }) {
   const logout = () => dispatch({ type: 'LOGOUT' })
 
   return (
-    <AuthContext.Provider value={{ ...state, register, login, logout }}>
-      {children}
-    </AuthContext.Provider>
+    <AuthStateContext.Provider value={{ ...state, register, login, logout }}>
+      <AuthDispatchContext.Provider value={dispatch}>
+        {children}
+      </AuthDispatchContext.Provider>
+    </AuthStateContext.Provider>
   )
 }

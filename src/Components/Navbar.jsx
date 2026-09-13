@@ -22,9 +22,16 @@ export default function Navbar({ onNavigate }) {
                 <button class="nav-link active" onClick={() => onNavigate('home')}>Inicio</button>
                 <button class="nav-link" onClick={() => onNavigate('catalog')}>Catálogo Completo</button>
                 <button class="nav-link" onClick={()=> onNavigate('contact')}>Contacto y Soporte</button>
-                <button class="nav-link" onClick={handleAuthAction}>
-                  {isAuthenticated ? `Cerrar Sesión (${user.name})` : 'Iniciar Sesión'}
-                </button>
+                {isAuthenticated ? (
+                  <>
+                  <button class="nav-link" onClick={handleAuthAction}>Cerrar Sesión</button>
+                    <button class="nav-link" onClick={() => onNavigate('profile')}>
+                      {user.name}
+                    </button>
+                  </>
+                ) : (
+                  <button class="nav-link" onClick={handleAuthAction}>Iniciar Sesión</button>
+                )}
                 <button class="nav-link" onClick={()=> onNavigate('cart')}>&#128722;</button>
             </div>
             </div>
