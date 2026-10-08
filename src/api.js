@@ -19,7 +19,22 @@ export async function apiRequest(path, options = {}) {
       ...options.headers,
     },
   })
-  const data = await response.json()
+  const contentType = response.headers.get('content-type') || ''
+  let data
+
+  if (contentType.includes('application/json') || contentType.includes('+json')) {
+    try {
+      data = await response.json()
+    } catch {
+      throw new Error(`La API devolvió JSON inválido (${response.status}) desde ${response.url}.`)
+    }
+  } else {
+    await response.text()
+    throw new Error(
+      `La URL configurada no respondió como API JSON (${response.status}, ${contentType || 'sin Content-Type'}): ${response.url}. ` +
+      'En Netlify, configura VITE_API_URL con la URL pública del backend en Render y vuelve a desplegar.'
+    )
+  }
 
   if (!response.ok) {
     throw new Error(data.mensaje || 'Ocurrió un error al comunicarse con el servidor.')
