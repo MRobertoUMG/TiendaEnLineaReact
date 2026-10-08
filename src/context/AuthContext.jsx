@@ -1,8 +1,9 @@
 import { useEffect, useReducer } from 'react'
 import { AuthDispatchContext, AuthStateContext } from './AuthContextBase.js'
+import { apiRequest } from '../api.js'
 
 const SESSION_KEY = 'tienda-session'
-const ACCOUNT_KEY = 'tienda-account'
+const LEGACY_ACCOUNT_KEY = 'tienda-account'
 
 const initialState = {
   user: null,
@@ -41,6 +42,10 @@ export function AuthProvider({ children }) {
   }))
 
   useEffect(() => {
+    localStorage.removeItem(LEGACY_ACCOUNT_KEY)
+  }, [])
+
+  useEffect(() => {
     if (state.user) {
       localStorage.setItem(SESSION_KEY, JSON.stringify(state.user))
     } else {
@@ -48,32 +53,48 @@ export function AuthProvider({ children }) {
     }
   }, [state.user])
 
-  const register = (userData) => {
+  const register = async (userData) => {
+    const response = await apiRequest('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({
+        nombreCompleto: userData.name,
+        correo: userData.email,
+        password: userData.password,
+      }),
+    })
     const user = {
-      id: crypto.randomUUID(),
-      name: userData.name,
-      email: userData.email,
-      role: userData.role || 'cliente',
+      id: response.usuario.id,
+      name: response.usuario.nombreCompleto,
+      email: response.usuario.correo,
+      role: response.usuario.rol,
     }
-    localStorage.setItem(ACCOUNT_KEY, JSON.stringify({ ...user, password: userData.password }))
     dispatch({ type: 'REGISTER', payload: user })
+    return user
   }
 
-  const login = (email, password) => {
-    const account = readStoredUser(ACCOUNT_KEY)
-    if (!account || account.email !== email || account.password !== password) {
-      return false
+  const login = async (email, password) => {
+    try {
+      const response = await apiRequest('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ correo: email, password }),
+      })
+      const user = {
+        id: response.usuario.id,
+        name: response.usuario.nombreCompleto,
+        email: response.usuario.correo,
+        role: response.usuario.rol,
+        accessDate: new Date().toISOString(),
+      }
+      dispatch({ type: 'LOGIN', payload: user })
+      return { success: true }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error
+          ? error.message
+          : 'No fue posible iniciar sesión.',
+      }
     }
-
-    const user = {
-      id: account.id,
-      name: account.name,
-      email: account.email,
-      role: account.role || 'cliente',
-      accessDate: new Date().toISOString(),
-    }
-    dispatch({ type: 'LOGIN', payload: user })
-    return true
   }
 
   const logout = () => dispatch({ type: 'LOGOUT' })

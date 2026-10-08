@@ -11,3 +11,17 @@ LOGOUT: Limpia los datos de sesión y restablece isAuthenticated a false.
 Se expone el estado y la función de despacho mediante Hooks personalizados.
 
 //Enlace de sitio web publicado: https://tiendaenlineareactv3.netlify.app/
+
+## Conexión con el backend
+
+React consume la API configurada en `VITE_API_URL`, definida en el `.env` raíz
+para desarrollo local como `http://localhost:5000`. El cliente agrega `/api`
+automáticamente; también admite una URL configurada que ya termine en `/api`.
+En Render, configura `VITE_API_URL` como la URL pública del servicio backend
+(por ejemplo, `https://tu-backend.onrender.com`) en las variables de entorno de
+compilación del frontend.
+
+El inicio de sesión y el registro usan `/auth/login` y `/auth/register`; el
+catálogo y el detalle consultan `/recursos` y `/recursos/:id`. La búsqueda del
+catálogo filtra por nombre con el parámetro `?buscar=termino`. Los productos
+deben estar guardados en MongoDB para aparecer en la tienda.

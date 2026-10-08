@@ -3,17 +3,38 @@ import { useAuth } from '../context/AuthContextBase.js'
 
 export default function SignUp({ onNavigate }) {
   const { register } = useAuth()
-  const [formData, setFormData] = useState({ name: '', email: '', password: '' })
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+  })
   const [registered, setRegistered] = useState(false)
+  const [error, setError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
 
   const handleChange = (event) => {
     setFormData({ ...formData, [event.target.name]: event.target.value })
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
-    register(formData)
-    setRegistered(true)
+    setError('')
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Las contraseñas no coinciden.')
+      return
+    }
+
+    setSubmitting(true)
+    try {
+      await register(formData)
+      setRegistered(true)
+    } catch (requestError) {
+      setError(requestError.message)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   if (registered) {
@@ -50,11 +71,15 @@ export default function SignUp({ onNavigate }) {
                 {/* Confirmar Contraseña */}
                 <div className="mb-4">
                   <label htmlFor="confirmPassword" className="form-label">Confirmar Contraseña</label>
-                  <input type="password" className="form-control" id="confirmPassword" placeholder="Confirma tu contraseña"/>
+                  <input type="password" className="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirma tu contraseña" value={formData.confirmPassword} onChange={handleChange} required/>
                 </div>
 
+                {error && <div className="alert alert-danger" role="alert">{error}</div>}
+
                 {/* Botón Registrarse */}
-                <button type="submit" className="btn btn-primary w-100 mb-3">Registrarse</button>
+                <button type="submit" className="btn btn-primary w-100 mb-3" disabled={submitting}>
+                  {submitting ? 'Registrando...' : 'Registrarse'}
+                </button>
 
                 {/* Enlace a Login */}
                 <p className="text-center text-muted">¿Ya tienes cuenta? 

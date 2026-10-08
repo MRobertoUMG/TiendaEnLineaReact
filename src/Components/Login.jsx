@@ -6,11 +6,24 @@ export default function Login({ onNavigate }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
-    const loggedIn = login(email, password)
-    setError(loggedIn ? '' : 'El correo o la contraseña no son correctos.')
+    setError('')
+    setSubmitting(true)
+
+    try {
+      const result = await login(email, password)
+      if (!result.success) {
+        setError(result.error)
+        return
+      }
+    } catch (requestError) {
+      setError(requestError.message)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   if (isAuthenticated) {
@@ -34,7 +47,9 @@ export default function Login({ onNavigate }) {
                   <input id="loginPassword" type="password" className="form-control" value={password} onChange={(event) => setPassword(event.target.value)} required />
                 </div>
                 {error && <div className="alert alert-danger" role="alert">{error}</div>}
-                <button type="submit" className="btn btn-primary w-100">Ingresar</button>
+                <button type="submit" className="btn btn-primary w-100" disabled={submitting}>
+                  {submitting ? 'Ingresando...' : 'Ingresar'}
+                </button>
               </form>
               <button type="button" className="btn btn-link w-100" onClick={() => onNavigate('signup')}>
                 Crear Cuenta
