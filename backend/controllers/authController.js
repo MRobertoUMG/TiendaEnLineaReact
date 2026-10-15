@@ -2,6 +2,16 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+const crearToken = (usuario) =>
+  jwt.sign(
+    {
+      id: usuario._id,
+      rol: usuario.rol,
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: "5m" }
+  );
+
 const register = async (req, res) => {
   try {
     const { nombreCompleto, correo, password } = req.body ?? {};
@@ -16,6 +26,13 @@ const register = async (req, res) => {
     ) {
       return res.status(400).json({
         mensaje: "Nombre, correo y contraseña son obligatorios",
+      });
+    }
+
+    if (!process.env.JWT_SECRET) {
+      console.error("JWT_SECRET no está configurado");
+      return res.status(500).json({
+        mensaje: "Error de configuración de autenticación",
       });
     }
 
@@ -35,8 +52,11 @@ const register = async (req, res) => {
       rol: "cliente",
     });
 
+    const token = crearToken(usuario);
+
     return res.status(201).json({
       mensaje: "Usuario registrado correctamente",
+      token,
       usuario: {
         id: usuario._id,
         nombreCompleto: usuario.nombreCompleto,
@@ -73,6 +93,13 @@ const login = async (req, res) => {
       });
     }
 
+    if (!process.env.JWT_SECRET) {
+      console.error("JWT_SECRET no está configurado");
+      return res.status(500).json({
+        mensaje: "Error de configuración de autenticación",
+      });
+    }
+
     const usuario = await User.findOne({
       correo: correo.trim().toLowerCase(),
     });
@@ -91,14 +118,7 @@ const login = async (req, res) => {
       });
     }
 
-    const token = jwt.sign(
-      {
-        id: usuario._id,
-        rol: usuario.rol,
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "5m" }
-    );
+    const token = crearToken(usuario);
 
     return res.json({
       mensaje: "Login exitoso",

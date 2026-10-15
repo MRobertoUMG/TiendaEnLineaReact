@@ -1,12 +1,26 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContextBase.js'
+import api from '../api/axios.js'
 
 export default function Login({ onNavigate }) {
   const { login, isAuthenticated, user } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [sessionMessage, setSessionMessage] = useState('')
   const [submitting, setSubmitting] = useState(false)
+
+  useEffect(() => {
+    const message = sessionStorage.getItem('sessionMessage')
+
+    if (message) {
+      sessionStorage.removeItem('sessionMessage')
+      const timeoutId = window.setTimeout(() => setSessionMessage(message), 0)
+      return () => window.clearTimeout(timeoutId)
+    }
+
+    return undefined
+  }, [])
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -14,13 +28,19 @@ export default function Login({ onNavigate }) {
     setSubmitting(true)
 
     try {
-      const result = await login(email, password)
-      if (!result.success) {
-        setError(result.error)
-        return
-      }
+      const response = await api.post('/auth/login', {
+        correo: email,
+        password,
+      })
+      login(response.data)
+      onNavigate('home')
     } catch (requestError) {
-      setError(requestError.message)
+      setError(
+        requestError.response?.data?.mensaje ||
+        requestError.response?.data?.message ||
+        requestError.message ||
+        'No fue posible iniciar sesión.'
+      )
     } finally {
       setSubmitting(false)
     }
@@ -37,6 +57,11 @@ export default function Login({ onNavigate }) {
           <div className="card shadow">
             <div className="card-body p-5">
               <h2 className="card-title text-center mb-4">Iniciar Sesión</h2>
+              {sessionMessage && (
+                <div className="alert alert-warning" role="alert">
+                  {sessionMessage}
+                </div>
+              )}
               <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                   <label htmlFor="loginEmail" className="form-label">Email</label>

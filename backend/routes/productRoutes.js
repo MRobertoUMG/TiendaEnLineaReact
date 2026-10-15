@@ -7,8 +7,11 @@ const {
   actualizarProducto,
   eliminarProducto,
 } = require("../controllers/productController");
+const verificarToken = require("../middleware/auth.middleware");
 
 const router = express.Router();
+
+router.use(verificarToken);
 
 router.get("/", obtenerProductos);
 router.get("/:id", obtenerProducto);

@@ -7,7 +7,6 @@ const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const productRoutes = require("./routes/productRoutes");
 const recursoRoutes = require("./routes/recursoRoutes");
-const verificarToken = require("./middleware/auth.middleware");
 
 connectDB();
 
@@ -16,8 +15,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use("/api/auth", authRoutes);
-app.use("/api/productos", verificarToken, productRoutes);
-app.use("/api/recursos", verificarToken, recursoRoutes);
+app.use("/api/productos", productRoutes);
+app.use("/api/recursos", recursoRoutes);
 
 app.get("/", (req, res) => {
   res.json({

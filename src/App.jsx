@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react'
+import { Navigate, Route, Routes, useNavigate, useParams } from 'react-router-dom'
 import { apiRequest, normalizeProduct } from './api.js'
 import './App.css'
 import Welcome from './Components/Welcome.jsx'
-import  Navbar  from './Components/Navbar.jsx'
+import Navbar from './Components/Navbar.jsx'
 import FeaturedProducts from './Components/FeaturedProducts.jsx'
 import Footer from './Components/Footer.jsx'
 import Product from './Components/Product.jsx'
@@ -12,15 +13,33 @@ import Contact from './Components/Contact.jsx'
 import Cart from './Components/Cart.jsx'
 import Login from './Components/Login.jsx'
 import Profile from './Components/Profile.jsx'
+import SessionInterceptor from './Components/SessionInterceptor.jsx'
+import ProtectedRoute from './Components/ProtectedRoute.jsx'
+import { useAuth } from './context/AuthContextBase.js'
+
+function ProductDetailRoute({ onNavigate }) {
+  const { productId } = useParams()
+
+  return (
+    <ProductDetail
+      productId={productId}
+      onClose={() => onNavigate('catalog')}
+    />
+  )
+}
 
 function App() {
-  const [selectedProductId, setSelectedProductId] = useState(null);
-  const [currentPage, setCurrentPage] = useState('home');
+  const { isAuthenticated } = useAuth()
+  const navigate = useNavigate()
   const [products, setProducts] = useState([])
   const [productsLoading, setProductsLoading] = useState(true)
   const [productsError, setProductsError] = useState('')
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      return undefined
+    }
+
     const abortController = new AbortController()
 
     async function loadProducts() {
@@ -30,6 +49,7 @@ function App() {
           throw new Error('La respuesta del servidor no contiene una lista de productos.')
         }
         setProducts(data.map(normalizeProduct))
+        setProductsError('')
       } catch (requestError) {
         if (requestError.name !== 'AbortError') {
           setProductsError(requestError.message)
@@ -43,7 +63,7 @@ function App() {
 
     loadProducts()
     return () => abortController.abort()
-  }, [])
+  }, [isAuthenticated])
 
   const handleCreateProduct = async (newProduct) => {
     const createdProduct = await apiRequest('/recursos', {
@@ -104,80 +124,65 @@ function App() {
     }
   }
 
-  const handleNavigate = (page) => {
-    setCurrentPage(page);
-    setSelectedProductId(null);
-  };
+  const handleNavigate = useCallback((page) => {
+    const paths = {
+      home: '/',
+      catalog: '/catalog',
+      signup: '/signup',
+      login: '/login',
+      profile: '/profile',
+      contact: '/contact',
+      cart: '/cart',
+    }
 
-  if (selectedProductId !== null) {
-    return (
-      <>
-        <Welcome />
-        <Navbar onNavigate={handleNavigate}/>
-        <ProductDetail 
-          productId={selectedProductId} 
-          onClose={() => setSelectedProductId(null)} 
-        />
-        <Footer/>
-      </>
-    );
+    navigate(paths[page] || '/')
+  }, [navigate])
+
+  const productProps = {
+    products,
+    loading: productsLoading,
+    error: productsError,
+    onSelectProduct: (productId) => navigate(`/products/${encodeURIComponent(productId)}`),
+    onCreateProduct: handleCreateProduct,
+    onDeleteProduct: handleDeleteProduct,
+    onUpdateProduct: handleUpdateProduct,
+    onSearchProducts: handleSearchProducts,
   }
 
   return (
-     <>
-        <Welcome />
-        <Navbar onNavigate={handleNavigate}/>
-        {currentPage === 'home' && (
-          <>
-          
-            <FeaturedProducts products={products.slice(0, 3)} />
-            <Product
-              products={products}
-              loading={productsLoading}
-              error={productsError}
-              onSelectProduct={setSelectedProductId}
-              onCreateProduct={handleCreateProduct}
-              onDeleteProduct={handleDeleteProduct}
-              onUpdateProduct={handleUpdateProduct}
-              onSearchProducts={handleSearchProducts}
-            />
-          </>
-        )}
-        {currentPage === 'catalog' && (
-          <Product
-            products={products}
-            loading={productsLoading}
-            error={productsError}
-            onSelectProduct={setSelectedProductId}
-            onCreateProduct={handleCreateProduct}
-            onDeleteProduct={handleDeleteProduct}
-            onUpdateProduct={handleUpdateProduct}
-            onSearchProducts={handleSearchProducts}
+    <>
+      <SessionInterceptor />
+      <Welcome />
+      <Navbar onNavigate={handleNavigate} />
+      <Routes>
+        <Route path="/login" element={<Login onNavigate={handleNavigate} />} />
+        <Route path="/signup" element={<SignUp onNavigate={handleNavigate} />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route element={<ProtectedRoute />}>
+          <Route
+            path="/"
+            element={
+              <>
+                <FeaturedProducts products={products.slice(0, 3)} />
+                <Product {...productProps} />
+              </>
+            }
           />
-        )}
-        {currentPage === 'signup' && (
-          <div>
-            <SignUp onNavigate={handleNavigate}/>
-          </div>
-        ) }
-        {currentPage === 'login' && (
-          <Login onNavigate={handleNavigate} />
-        )}
-        {currentPage === 'profile' && (
-          <Profile onNavigate={handleNavigate} />
-        )}
-        {currentPage === 'contact' && (
-          <div>
-            <Contact/>
-          </div>
-        ) }
-        {currentPage === 'cart' && (
-          <div>
-            <Cart/>
-          </div>
-        ) }
-        <Footer/>
-     </>
+          <Route path="/catalog" element={<Product {...productProps} />} />
+          <Route
+            path="/products/:productId"
+            element={<ProductDetailRoute onNavigate={handleNavigate} />}
+          />
+          <Route
+            path="/profile"
+            element={<Profile onNavigate={handleNavigate} />}
+          />
+        </Route>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+      <Footer />
+    </>
   )
 }
 
