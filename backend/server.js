@@ -20,7 +20,7 @@ app.use("/api/recursos", recursoRoutes);
 
 app.get("/", (req, res) => {
   res.json({
-    mensaje: "API Tarea 4 funcionando",
+    mensaje: "API Tarea 5 funcionando",
   });
 });
 

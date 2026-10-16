@@ -1,46 +1,17 @@
 //Estudiante: Mario Roberto Rompich Yoc 9490-17-17052
 
 //Descripcion: 
-Se elige una arquitectura de Estado Global
-Opción A: Context API + useReducer
-Se crea un proveedor centralizado (AuthProvider) que encapsule el useReducer.
-Se define un estado inicial con algunas propiedades.
-se implementa un reducer que gestione como mínimo 4 acciones considerando:
-LOGIN: Almacena la información del usuario y actualiza isAuthenticated a true.
-LOGOUT: Limpia los datos de sesión y restablece isAuthenticated a false.
-Se expone el estado y la función de despacho mediante Hooks personalizados.
+Backend: Se implementó JWT en el endpoint POST /api/auth/login, configurando una expiración de 5 minutos mediante expiresIn: "5m". Un middleware verifica la firma y vigencia del token en las rutas protegidas, devolviendo 401 Unauthorized cuando es inválido o ha expirado.
+
+Frontend: Se configuró Axios para enviar automáticamente el token en el encabezado Authorization: Bearer <token>. Un interceptor detecta los errores 401, elimina los datos de sesión, actualiza el estado de autenticación, muestra un mensaje de expiración y redirige al usuario a /login mediante React Router.
 
 //Enlace de sitio web publicado: https://tiendaenlinea-frontendv2.netlify.app/
-
-## Conexión con el backend
-
-React consume la API configurada en `VITE_API_URL`, definida en el `.env` raíz
-para desarrollo local como `http://localhost:5000`. El cliente agrega `/api`
-automáticamente; también admite una URL configurada que ya termine en `/api`.
-En Render, se configuro `VITE_API_URL` como la URL pública `https://tarea4-backend-api.onrender.com/` en las variables de entorno de
-compilación del frontend.
-
-Las solicitudes pasan por la instancia Axios centralizada en `src/api/axios.js`,
-que agrega automáticamente el JWT guardado en la sesión al encabezado
-`Authorization`. `AuthProvider` comparte el token y el usuario entre los
-componentes, y cierra la sesión local cinco minutos después del inicio de
-sesión; el backend sigue validando la vigencia real del JWT.
-El formulario inicia sesión mediante `POST /auth/login` y vuelve a la página
-principal de la tienda al autenticarse correctamente.
-El interceptor global de respuestas cierra la sesión y muestra un aviso en el
-login cuando una solicitud protegida recibe un `401`. También programa el
-cierre local al llegar a `expiresAt`; la expiración efectiva sigue siendo
-validada por el backend.
-
-Las vistas de inicio, catálogo, detalle de producto y perfil están protegidas
-por `ProtectedRoute`. Las rutas del frontend usan React Router y redirigen al
-login si no hay sesión local; esto no sustituye la validación JWT del backend.
 
 Repositorio: https://github.com/MRobertoUMG/TiendaEnLineaReact/tree/Tarea4
 
 Frontend: https://github.com/MRobertoUMG/TiendaEnLineaReact/tree/Tarea5
 
-Backend: https://tarea4-backend-api.onrender.com/
+Backend: https://tarea5-backend-api.onrender.com/
 
 
 POST
