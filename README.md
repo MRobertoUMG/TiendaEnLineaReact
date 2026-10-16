@@ -5,11 +5,10 @@ Backend: Se implementó JWT en el endpoint POST /api/auth/login, configurando un
 
 Frontend: Se configuró Axios para enviar automáticamente el token en el encabezado Authorization: Bearer <token>. Un interceptor detecta los errores 401, elimina los datos de sesión, actualiza el estado de autenticación, muestra un mensaje de expiración y redirige al usuario a /login mediante React Router.
 
-//Enlace de sitio web publicado: https://tiendaenlinea-frontendv2.netlify.app/
 
 Repositorio: https://github.com/MRobertoUMG/TiendaEnLineaReact/tree/Tarea4
 
-Frontend: https://github.com/MRobertoUMG/TiendaEnLineaReact/tree/Tarea5
+Frontend: https://tiendaenlinea-frontendv2.netlify.app/
 
 Backend: https://tarea5-backend-api.onrender.com/
 
