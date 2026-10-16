@@ -10,7 +10,7 @@ LOGIN: Almacena la información del usuario y actualiza isAuthenticated a true.
 LOGOUT: Limpia los datos de sesión y restablece isAuthenticated a false.
 Se expone el estado y la función de despacho mediante Hooks personalizados.
 
-//Enlace de sitio web publicado: https://tiendaenlinea-frontend.netlify.app/
+//Enlace de sitio web publicado: https://tiendaenlinea-frontendv2.netlify.app/
 
 ## Conexión con el backend
 
@@ -38,7 +38,7 @@ login si no hay sesión local; esto no sustituye la validación JWT del backend.
 
 Repositorio: https://github.com/MRobertoUMG/TiendaEnLineaReact/tree/Tarea4
 
-Frontend: https://tiendaenlinea-frontend.netlify.app/
+Frontend: https://github.com/MRobertoUMG/TiendaEnLineaReact/tree/Tarea5
 
 Backend: https://tarea4-backend-api.onrender.com/
 
